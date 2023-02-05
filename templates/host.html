@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+    <input type="text" id="question" placeholder="Question" />
+    <textarea id="answers" placeholder="Answers"></textarea>
+    <button id="ask">Ask</button>
+{% endblock %}
+{% block script %}
+    <script type="text/javascript" charset="utf-8">
+        var socket = io();
+        socket.on('connect', function() {
+            socket.emit('join', {data: {{ host_room_id|tojson }} });
+        });
+        socket.on('message', function(data) {
+            console.log(data);
+        });
+
+        document.getElementById('ask').addEventListener('click', function() {
+            var question = document.getElementById('question').value;
+            var answers = document.getElementById('answers').value.split('\n');
+            socket.emit('ask', {question: question, answers: answers, room: {{ player_room_id|tojson }}});
+        });
+    </script>
+{% endblock %}
